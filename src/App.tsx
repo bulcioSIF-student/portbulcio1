@@ -15,7 +15,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
-    <Router basename="/bulcioSIF-student/portbulcio1/">
+    <Router basename="/portbulcio1/">
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
