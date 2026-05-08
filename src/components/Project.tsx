@@ -1,4 +1,4 @@
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 
 const Projects = () => {
   const projectList = [
@@ -22,50 +22,101 @@ const Projects = () => {
     }
   ];
 
+  const customStyles = `
+    .projects-section { background-color: #faf9f6; padding: 120px 0; }
+    .project-row { 
+      border-bottom: 1px solid #e5e1da; 
+      padding: 40px 0; 
+      transition: all 0.4s ease;
+      cursor: pointer;
+    }
+    .project-row:hover { background-color: #f3f2ee; }
+    .project-name { 
+      font-size: 2.5rem; 
+      font-weight: 300; 
+      letter-spacing: -1px; 
+      transition: transform 0.3s ease;
+    }
+    .project-row:hover .project-name { transform: translateX(10px); color: #000; }
+    .tech-tag { 
+      font-size: 10px; 
+      text-transform: uppercase; 
+      letter-spacing: 2px; 
+      color: #4a7c59; 
+      font-weight: 700;
+    }
+    .view-link {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 800;
+      color: #1a1814;
+      text-decoration: none;
+      position: relative;
+    }
+    .view-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -2px;
+      left: 0;
+      background-color: #1a1814;
+      transition: width 0.3s ease;
+    }
+    .project-row:hover .view-link::after { width: 100%; }
+  `;
+
   return (
-    <section className="py-20 bg-[#faf9f6]">
-      <Container>
-        {/* Simple Header */}
-        <div className="mb-16 border-bottom border-dark pb-4 d-flex justify-content-between align-items-end">
-          <h2 className="font-serif text-4xl mb-0">Projects</h2>
-          <span className="font-mono text-[10px] text-[#928f85] uppercase tracking-widest">Selected Works</span>
-        </div>
-
-        {/* Project Rows */}
-        {projectList.map((item, index) => (
-          <div key={index} className="group border-bottom border-[#e5e1da] py-5">
-            <Row className="align-items-center">
-              {/* Year/Index */}
-              <Col xs={2} md={1} className="font-mono text-[12px] text-[#928f85]">
-                {item.year}
-              </Col>
-
-              {/* Name and Tech */}
-              <Col xs={10} md={4}>
-                <h3 className="text-xl font-medium text-[#1a1814] mb-1">{item.name}</h3>
-                <p className="font-mono text-[10px] uppercase tracking-tighter text-[#4a7c59] mb-0">
-                  {item.tech}
-                </p>
-              </Col>
-
-              {/* Description */}
-              <Col md={5} className="mt-3 mt-md-0">
-                <p className="text-[#5e5b54] text-sm mb-0 leading-relaxed">
-                  {item.description}
-                </p>
-              </Col>
-
-              {/* Link */}
-              <Col md={2} className="text-md-end mt-4 mt-md-0">
-                <Button variant="link" className="text-dark p-0 text-decoration-none font-weight-bold text-[13px] hover-underline">
-                  View Case Study →
-                </Button>
-              </Col>
-            </Row>
+    <>
+      <style>{customStyles}</style>
+      <section className="projects-section">
+        <Container>
+          {/* Header Area */}
+          <div className="d-flex justify-content-between align-items-end mb-5">
+            <div>
+              <span className="text-uppercase tracking-widest text-muted small fw-bold" style={{ letterSpacing: '3px' }}>
+                Archive
+              </span>
+              <h2 className="display-4 fw-light m-0">Selected <span style={{fontFamily: 'serif', fontStyle: 'italic'}}>Works</span></h2>
+            </div>
+            <div className="text-muted small d-none d-md-block">01 — 03</div>
           </div>
-        ))}
-      </Container>
-    </section>
+
+          {/* Project List */}
+          {projectList.map((item, index) => (
+            <div key={index} className="project-row">
+              <Row className="align-items-center">
+                {/* Year */}
+                <Col md={1} className="text-muted font-monospace small d-none d-md-block">
+                  ({item.year})
+                </Col>
+
+                {/* Title & Tech */}
+                <Col md={5} xs={12}>
+                  <div className="tech-tag mb-2">{item.tech}</div>
+                  <h3 className="project-name mb-0">{item.name}</h3>
+                </Col>
+
+                {/* Description */}
+                <Col md={4} xs={12} className="my-3 my-md-0">
+                  <p className="text-muted mb-0" style={{ lineHeight: '1.6', fontSize: '0.95rem' }}>
+                    {item.description}
+                  </p>
+                </Col>
+
+                {/* CTA */}
+                <Col md={2} xs={12} className="text-md-end">
+                  <a href="#" className="view-link">
+                    Explore Case →
+                  </a>
+                </Col>
+              </Row>
+            </div>
+          ))}
+        </Container>
+      </section>
+    </>
   );
 };
 
