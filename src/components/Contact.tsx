@@ -1,25 +1,20 @@
 import { useState } from 'react';
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 import emailjs from '@emailjs/browser';
-//yo
 
 const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState({ type: '', msg: '' });
 
-  // Fallback to your Railway URL if the environment variable is missing
-  const API_URL = import.meta.env.VITE_API_URL || 'https://portfolioapi-production-9784.up.railway.app';
+  // Use only one definition for API_URL
+  const API_URL = 'https://portfolioapi-production-9784.up.railway.app';
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus({ type: 'info', msg: 'Sending your message...' });
 
-    // Use the confirmed Public Domain from your Railway settings
-    const API_URL = 'https://portfolioapi-production-9784.up.railway.app';
-
     try {
-      // 1. Send to MongoDB Backend (Railway)
-      // We use /api/contacts (plural) as it's the standard for Express collections
+      // 1. Send to MongoDB Backend
       const dbResponse = await fetch(`${API_URL}/api/contacts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -44,15 +39,12 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setStatus({ type: 'success', msg: 'Success! Message saved and email sent.' });
         setFormData({ name: '', email: '', message: '' });
       } else {
-        // Detailed error reporting to help you see which part failed
-        const dbError = dbResponse.ok ? "Database Saved" : `Database Error (${dbResponse.status})`;
-        const emailError = emailResponse.status === 200 ? "Email Sent" : `Email Error (${emailResponse.status})`;
-        setStatus({ type: 'warning', msg: `${dbError} | ${emailError}` });
+        const dbStatus = dbResponse.ok ? "Saved" : `Failed (${dbResponse.status})`;
+        setStatus({ type: 'warning', msg: `DB: ${dbStatus} | Email: ${emailResponse.status}` });
       }
     } catch (error: any) {
       console.error('Submission Error:', error);
-      // This catches the "Failed to fetch" if the URL is wrong or the server is down
-      setStatus({ type: 'danger', msg: "Network Error: Could not reach the backend server." });
+      setStatus({ type: 'danger', msg: "Network Error: Could not reach the server." });
     }
   };
 
@@ -97,7 +89,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                           type="text"
                           className="minimal-input"
                           value={formData.name}
-                          onChange={(e) => setFormData({...formData, name: (e.target as HTMLInputElement).value})}
+                          onChange={(e) => setFormData({...formData, name: e.target.value})}
                           required
                         />
                       </Form.Group>
@@ -107,7 +99,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                           type="email"
                           className="minimal-input"
                           value={formData.email}
-                          onChange={(e) => setFormData({...formData, email: (e.target as HTMLInputElement).value})}
+                          onChange={(e) => setFormData({...formData, email: e.target.value})}
                           required
                         />
                       </Form.Group>
@@ -119,7 +111,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                           className="minimal-input"
                           style={{ resize: 'none' }}
                           value={formData.message}
-                          onChange={(e) => setFormData({...formData, message: (e.target as HTMLTextAreaElement).value})}
+                          onChange={(e) => setFormData({...formData, message: e.target.value})}
                           required
                         />
                       </Form.Group>
