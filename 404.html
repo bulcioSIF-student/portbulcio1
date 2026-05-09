@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script>
+      const path = window.location.pathname;
+      const base = '/portbulcio1';
+      sessionStorage.setItem('redirect', path);
+      window.location.replace(base + '/?p=' + encodeURIComponent(path.slice(base.length)));
+    </script>
+  </head>
+  <body></body>
+</html>
