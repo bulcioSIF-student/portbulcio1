@@ -6,7 +6,8 @@ const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState({ type: '', msg: '' });
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  // Fallback to your Railway URL if the environment variable is missing
+  const API_URL = import.meta.env.VITE_API_URL || 'https://portfolioapi-production-9784.up.railway.app';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,6 +24,7 @@ const Contact = () => {
       console.log('DB Response status:', dbResponse.status);
 
       // 2. Send via EmailJS
+      // CRITICAL: Ensure the keys below match your EmailJS Template {{variables}} exactly
       const emailResponse = await emailjs.send(
         import.meta.env.VITE_EMAIL_SERVICE_ID,
         import.meta.env.VITE_EMAIL_TEMPLATE_ID,
@@ -30,9 +32,8 @@ const Contact = () => {
           from_name: formData.name,
           from_email: formData.email,
           message: formData.message,
-          // Added time to match the {{time}} variable in your EmailJS template
-          time: new Date().toLocaleString(), 
-          to_name: "John Ross",
+          time: new Date().toLocaleString(), // Matches {{time}} in your template
+          to_name: "John Ross",             // Matches {{to_name}} in your template
         },
         import.meta.env.VITE_EMAIL_PUBLIC_KEY
       );
@@ -47,7 +48,7 @@ const Contact = () => {
       }
     } catch (error: any) {
       console.error('Submission Error:', error);
-      // Improved error message to prevent [object Object] display
+      // Extracts actual error text to fix the [object Object] UI issue
       const errorMessage = error?.text || error?.message || "An unexpected error occurred.";
       setStatus({ type: 'danger', msg: `Error: ${errorMessage}` });
     }
@@ -94,7 +95,7 @@ const Contact = () => {
                           type="text"
                           className="minimal-input"
                           value={formData.name}
-                          onChange={(e) => setFormData({...formData, name: e.target.value})}
+                          onChange={(e) => setFormData({...formData, name: (e.target as HTMLInputElement).value})}
                           required
                         />
                       </Form.Group>
@@ -104,7 +105,7 @@ const Contact = () => {
                           type="email"
                           className="minimal-input"
                           value={formData.email}
-                          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                          onChange={(e) => setFormData({...formData, email: (e.target as HTMLInputElement).value})}
                           required
                         />
                       </Form.Group>
@@ -116,7 +117,7 @@ const Contact = () => {
                           className="minimal-input"
                           style={{ resize: 'none' }}
                           value={formData.message}
-                          onChange={(e) => setFormData({...formData, message: e.target.value})}
+                          onChange={(e) => setFormData({...formData, message: (e.target as HTMLTextAreaElement).value})}
                           required
                         />
                       </Form.Group>
