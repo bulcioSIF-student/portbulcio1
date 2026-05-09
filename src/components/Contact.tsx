@@ -10,22 +10,23 @@ const Contact = () => {
   // Fallback to your Railway URL if the environment variable is missing
   const API_URL = import.meta.env.VITE_API_URL || 'https://portfolioapi-production-9784.up.railway.app';
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus({ type: 'info', msg: 'Sending your message...' });
 
+    // Use the confirmed Public Domain from your Railway settings
+    const API_URL = 'https://portfolioapi-production-9784.up.railway.app';
+
     try {
       // 1. Send to MongoDB Backend (Railway)
-      const dbResponse = await fetch(`${API_URL}/api/contact`, {
+      // We use /api/contacts (plural) as it's the standard for Express collections
+      const dbResponse = await fetch(`${API_URL}/api/contacts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      console.log('DB Response status:', dbResponse.status);
-
       // 2. Send via EmailJS
-      // CRITICAL: Ensure the keys below match your EmailJS Template {{variables}} exactly
       const emailResponse = await emailjs.send(
         import.meta.env.VITE_EMAIL_SERVICE_ID,
         import.meta.env.VITE_EMAIL_TEMPLATE_ID,
@@ -33,25 +34,25 @@ const Contact = () => {
           from_name: formData.name,
           from_email: formData.email,
           message: formData.message,
-          time: new Date().toLocaleString(), // Matches {{time}} in your template
-          to_name: "John Ross",             // Matches {{to_name}} in your template
+          time: new Date().toLocaleString(),
+          to_name: "John Ross",
         },
         import.meta.env.VITE_EMAIL_PUBLIC_KEY
       );
-
-      console.log('Email Response status:', emailResponse.status);
 
       if (dbResponse.ok && emailResponse.status === 200) {
         setStatus({ type: 'success', msg: 'Success! Message saved and email sent.' });
         setFormData({ name: '', email: '', message: '' });
       } else {
-        setStatus({ type: 'warning', msg: `DB: ${dbResponse.status}, Email: ${emailResponse.status}` });
+        // Detailed error reporting to help you see which part failed
+        const dbError = dbResponse.ok ? "Database Saved" : `Database Error (${dbResponse.status})`;
+        const emailError = emailResponse.status === 200 ? "Email Sent" : `Email Error (${emailResponse.status})`;
+        setStatus({ type: 'warning', msg: `${dbError} | ${emailError}` });
       }
     } catch (error: any) {
       console.error('Submission Error:', error);
-      // Extracts actual error text to fix the [object Object] UI issue
-      const errorMessage = error?.text || error?.message || "An unexpected error occurred.";
-      setStatus({ type: 'danger', msg: `Error: ${errorMessage}` });
+      // This catches the "Failed to fetch" if the URL is wrong or the server is down
+      setStatus({ type: 'danger', msg: "Network Error: Could not reach the backend server." });
     }
   };
 
