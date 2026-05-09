@@ -7,6 +7,7 @@ const Contact = () => {
   const [status, setStatus] = useState({ type: '', msg: '' });
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  console.log('API URL:', API_URL);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,6 +20,8 @@ const Contact = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
+
+      console.log('DB Response status:', dbResponse.status);
 
       // 2. Send via EmailJS
       const emailResponse = await emailjs.send(
@@ -33,13 +36,17 @@ const Contact = () => {
         import.meta.env.VITE_EMAIL_PUBLIC_KEY
       );
 
+      console.log('Email Response status:', emailResponse.status);
+
       if (dbResponse.ok && emailResponse.status === 200) {
         setStatus({ type: 'success', msg: 'Success! Message saved and email sent.' });
         setFormData({ name: '', email: '', message: '' });
+      } else {
+        setStatus({ type: 'warning', msg: `DB: ${dbResponse.status}, Email: ${emailResponse.status}` });
       }
     } catch (error) {
       console.error('Submission Error:', error);
-      setStatus({ type: 'danger', msg: 'Something went wrong. Please try again later.' });
+      setStatus({ type: 'danger', msg: `Error: ${error}` });
     }
   };
 
