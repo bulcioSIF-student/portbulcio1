@@ -7,7 +7,6 @@ const Contact = () => {
   const [status, setStatus] = useState({ type: '', msg: '' });
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  console.log('API URL:', API_URL);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,6 +30,8 @@ const Contact = () => {
           from_name: formData.name,
           from_email: formData.email,
           message: formData.message,
+          // Added time to match the {{time}} variable in your EmailJS template
+          time: new Date().toLocaleString(), 
           to_name: "John Ross",
         },
         import.meta.env.VITE_EMAIL_PUBLIC_KEY
@@ -44,9 +45,11 @@ const Contact = () => {
       } else {
         setStatus({ type: 'warning', msg: `DB: ${dbResponse.status}, Email: ${emailResponse.status}` });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Submission Error:', error);
-      setStatus({ type: 'danger', msg: `Error: ${error}` });
+      // Improved error message to prevent [object Object] display
+      const errorMessage = error?.text || error?.message || "An unexpected error occurred.";
+      setStatus({ type: 'danger', msg: `Error: ${errorMessage}` });
     }
   };
 
