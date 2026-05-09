@@ -6,13 +6,17 @@ const Dashboard = () => {
   const [messages, setMessages] = useState([]);
   const navigate = useNavigate();
 
+  // Use the environment variable from your .env / GitHub Secrets
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
+
   const fetchMessages = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/messages');
+      // Changed localhost to API_BASE_URL
+      const response = await fetch(`${API_BASE_URL}/api/messages`);
       const data = await response.json();
       setMessages(data);
     } catch (err) {
-      console.error("Failed to fetch messages");
+      console.error("Failed to fetch messages from:", API_BASE_URL);
     }
   };
 
@@ -23,19 +27,18 @@ const Dashboard = () => {
     fetchMessages();
   }, [navigate]);
 
-  // NEW: DELETE HANDLER
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this message?")) {
       try {
-        const response = await fetch(`http://localhost:5000/api/messages/${id}`, {
+        // Changed localhost to API_BASE_URL
+        const response = await fetch(`${API_BASE_URL}/api/messages/${id}`, {
           method: 'DELETE',
         });
         if (response.ok) {
-          // Refresh the list after deleting
           fetchMessages();
         }
       } catch (err) {
-        console.error("Failed to delete message");
+        console.error("Failed to delete message at:", API_BASE_URL);
       }
     }
   };
@@ -63,18 +66,19 @@ const Dashboard = () => {
               <th className="py-3">From</th>
               <th className="py-3">Email</th>
               <th className="py-3">Message</th>
-              <th className="py-3 text-center">Action</th> {/* NEW COLUMN */}
+              <th className="py-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
             {messages.length > 0 ? messages.map((msg: any) => (
               <tr key={msg._id} className="border-bottom border-light">
-                <td className="px-4 text-muted small">{new Date(msg.date).toLocaleDateString()}</td>
+                <td className="px-4 text-muted small">
+                  {msg.date ? new Date(msg.date).toLocaleDateString() : 'N/A'}
+                </td>
                 <td className="fw-bold text-dark">{msg.name}</td>
                 <td className="small">{msg.email}</td>
                 <td className="text-muted small" style={{ maxWidth: '300px' }}>{msg.message}</td>
                 <td className="text-center">
-                  {/* DELETE BUTTON */}
                   <Button 
                     variant="link" 
                     className="text-danger p-0 text-decoration-none small"
