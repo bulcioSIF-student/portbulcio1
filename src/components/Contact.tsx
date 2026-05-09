@@ -6,19 +6,21 @@ const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState({ type: '', msg: '' });
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus({ type: 'info', msg: 'Sending your message...' });
 
     try {
-      // 1. Send to MongoDB Backend
-      const dbResponse = await fetch('http://localhost:5000/api/contact', {
+      // 1. Send to MongoDB Backend (Railway)
+      const dbResponse = await fetch(`${API_URL}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
 
-      // 2. Send via EmailJS using your .env variables
+      // 2. Send via EmailJS
       const emailResponse = await emailjs.send(
         import.meta.env.VITE_EMAIL_SERVICE_ID,
         import.meta.env.VITE_EMAIL_TEMPLATE_ID,
@@ -26,7 +28,7 @@ const Contact = () => {
           from_name: formData.name,
           from_email: formData.email,
           message: formData.message,
-          to_name: "John Ross", // Your name
+          to_name: "John Ross",
         },
         import.meta.env.VITE_EMAIL_PUBLIC_KEY
       );
@@ -78,8 +80,8 @@ const Contact = () => {
                     <Form onSubmit={handleSubmit}>
                       <Form.Group className="mb-4">
                         <Form.Label className="label-caps">Full Name</Form.Label>
-                        <Form.Control 
-                          type="text" 
+                        <Form.Control
+                          type="text"
                           className="minimal-input"
                           value={formData.name}
                           onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -88,8 +90,8 @@ const Contact = () => {
                       </Form.Group>
                       <Form.Group className="mb-4">
                         <Form.Label className="label-caps">Email Address</Form.Label>
-                        <Form.Control 
-                          type="email" 
+                        <Form.Control
+                          type="email"
                           className="minimal-input"
                           value={formData.email}
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -98,9 +100,9 @@ const Contact = () => {
                       </Form.Group>
                       <Form.Group className="mb-5">
                         <Form.Label className="label-caps">Your Message</Form.Label>
-                        <Form.Control 
-                          as="textarea" 
-                          rows={3} 
+                        <Form.Control
+                          as="textarea"
+                          rows={3}
                           className="minimal-input"
                           style={{ resize: 'none' }}
                           value={formData.message}
